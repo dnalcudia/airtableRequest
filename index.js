@@ -19,10 +19,30 @@ async function foo() {
   return obj
 }
 
-let data
+const cyObj = {}
+const y1Obj = {}
+const y2Obj = {}
+const y3Obj = {}
 
-data = foo().then((response) => {
-  return Object.keys(response.fields)
+foo().then((response) => {
+  const keys = Object.keys(response.fields)
+  const cyArr = keys.filter((key) => key.includes('CY')).sort()
+  const y1Arr = keys.filter((key) => key.includes('Y1')).sort()
+  const y2Arr = keys.filter((key) => key.includes('Y2')).sort()
+  const y3Arr = keys.filter((key) => key.includes('Y3')).sort()
+
+  cyArr.map((key) => {
+    cyObj[key] = response.fields[key]
+  })
+  y1Arr.map((key) => {
+    y1Obj[key] = response.fields[key]
+  })
+  y2Arr.map((key) => {
+    y2Obj[key] = response.fields[key]
+  })
+  y3Arr.map((key) => {
+    y3Obj[key] = response.fields[key]
+  })
+
+  console.log(y1Obj, y2Obj)
 })
-
-console.log(data)
