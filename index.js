@@ -8,8 +8,9 @@ var myInit = {
   cache: 'default',
 }
 
+//  List Valuation Requests records
 var myRequest = new Request(
-  'https://api.airtable.com/v0/appF2nPR1LCQnzRtY/Valuation%20Requests/recSLVnYo4eIP6iv6',
+  'https://api.airtable.com/v0/appF2nPR1LCQnzRtY/Valuation%20Requests?maxRecords=3&view=Grid%20view',
   myInit,
 )
 
@@ -19,30 +20,33 @@ async function foo() {
   return obj
 }
 
-const cyObj = {}
-const y1Obj = {}
-const y2Obj = {}
-const y3Obj = {}
+const getYearObj = (keys, allowed, fields) => {
+  return keys
+    .filter((key) => allowed.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = fields[key]
+      return obj
+    }, {})
+}
 
-foo().then((response) => {
-  const keys = Object.keys(response.fields)
-  const cyArr = keys.filter((key) => key.includes('CY')).sort()
-  const y1Arr = keys.filter((key) => key.includes('Y1')).sort()
-  const y2Arr = keys.filter((key) => key.includes('Y2')).sort()
-  const y3Arr = keys.filter((key) => key.includes('Y3')).sort()
+const formmatedClients = foo().then((response) => {
+  const clients = response.records.map(({ fields }) => {
+    const keys = Object.keys(fields)
+    const cyKeys = keys.filter((key) => key.includes('CY')).sort()
+    const y1Keys = keys.filter((key) => key.includes('Y1')).sort()
+    const y2Keys = keys.filter((key) => key.includes('Y2')).sort()
+    const y3Keys = keys.filter((key) => key.includes('Y3')).sort()
 
-  cyArr.map((key) => {
-    cyObj[key] = response.fields[key]
-  })
-  y1Arr.map((key) => {
-    y1Obj[key] = response.fields[key]
-  })
-  y2Arr.map((key) => {
-    y2Obj[key] = response.fields[key]
-  })
-  y3Arr.map((key) => {
-    y3Obj[key] = response.fields[key]
+    return {
+      clientId: fields.Client[0],
+      cy: getYearObj(keys, cyKeys, fields),
+      y1: getYearObj(keys, y1Keys, fields),
+      y2: getYearObj(keys, y2Keys, fields),
+      y3: getYearObj(keys, y3Keys, fields),
+    }
   })
 
-  console.log(y1Obj, y2Obj)
+  return clients
 })
+
+console.log(formmatedClients)
